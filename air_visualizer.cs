@@ -66,10 +66,13 @@ public class AirVisualizer {
                     // Send is drawing MIDI change method
                     if (isDrawing ^ wasDrawing) drawLink.sendCommand(new byte[]{0, 0, 0});
 
+                    // Scale heights
+                    // Centimeters
                     var scaleX = indexTip.x / 10;
                     var scaleY = indexTip.y / 10;
                     var scaleZ = indexTip.z / 10;
 
+                    // Send coordinates over MIDI
                     if (scaleX > 0) drawLink.sendCommand(new byte[]{0b10011010, (byte) scaleX, 0});
                     else            drawLink.sendCommand(new byte[]{0b10011010, 0, (byte) MathF.Abs(scaleX)});
 
@@ -78,6 +81,9 @@ public class AirVisualizer {
                     
                     if (scaleZ > 0) drawLink.sendCommand(new byte[]{0b10011100, (byte) scaleZ, 0});
                     else            drawLink.sendCommand(new byte[]{0b10011100, 0, (byte) MathF.Abs(scaleZ)});                    
+
+                    // Exit if not in drawing mode and close to camera
+                    if (!isDrawing && scaleX > 75) return;
 
                 }
             

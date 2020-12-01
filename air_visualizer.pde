@@ -10,6 +10,10 @@ float xPos;
 float yPos;
 boolean isDrawing;
 
+// Window variables
+int width;
+int height;
+
 void setup() {
 	
 	// Instantiate the MIDI port
@@ -31,56 +35,89 @@ void setup() {
 			}
 		}
 	}
-	
 	println("Found C# loopback port!");
+
+	// Control parameters - draw() will not update unless called from MIDI routine
+	isDrawing = true;
+	noLoop();
 	
-	// Set up drawing parameters
-	
+	// TODO
+	// Drawing window parameterse
+	size(width, height);
+
+
 }
 
 void draw() {
-	
-	delay(10);
+
+	// TODO
+	// Drawing mode
+	if (isDrawing) {
+		
+		
+
+
+
+
+
+	// TO DO
+	// Color selection mode
+	} else {
+		
+
+
+
+
+
+
+
+
+		// Low threshold to exit application
+		if (yPos > 75) {
+			save("poof.png");
+			exit();
+		}
+	}
 }
 
-// void noteOn(int channel, int pitch, int velocity) {
-// 	char dir = 'o';
-// 	if (channel == 10) dir = 'X';
-// 	if (channel == 11) dir = 'Y';
-// 	if (channel == 12) dir = 'Z';
-// 	if (pitch > 0) println(dir + " :  " + pitch);
-// 	else println(dir + " : - " + velocity);
-// }
-
 void rawMidi(byte[] data) {
+
+	// Check for mode change message
 	int status = (int)(data[0] & 0xFF);
-	if (status == 0) println(isDrawing);
+	if (status == 0) {
+		if (isDrawing) isDrawing = false;
+		isDrawing = true;	
+	}
 	
-
+	// Print coordinates for debugging
 	char dir = 'o';
-	// if (status == 154) dir = 'X';
-	// if (status == 155) dir = 'Y';
-	// if (status == 156) dir = 'Z';
+	if (status == 154) dir = 'X';
+	if (status == 155) dir = 'Y';
+	if (status == 156) dir = 'Z';
+	
+	int posPos = (int)(data[1] & 0xFF);
+	int posNeg = (int)(data[2] & 0xFF);
+	println(dir + ": " + (posPos - posNeg));
+	
+	// Set coordinates
+	if (status == 154) xPos = (float) (posPos - posNeg) * 1.5;
+	if (status == 155) xPos = (float) (posPos - posNeg) * 1.5;
 
-	// int posPos = (int)(data[1] & 0xFF);
-	// int posNeg = (int)(data[2] & 0xFF);
-	// println(dir + ": " + (posPos - posNeg));
+
+	// Set drawing size
+	if (isDrawing && status == 156) drawSize = (float) (posPos - posNeg) * 1.5;
+	
+	// TODO
+	// Set color
+	if (!isDrawing) {
+		c = new Color();
+	}
+
+	// Recall the draw function
+	redraw();
 }
 
 void delay(int time) {
 	int current = millis();
 	while(millis() < current + time) Thread.yield();
-}
-
-void something() {
-	redraw();
-	save("yourFile");
-	resume();
-	exit();
-	dispose();
-	noCursor();
-	loop();
-	noLoop();
-	stop();
-	pause();
 }
