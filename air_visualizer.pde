@@ -10,10 +10,11 @@ color c;
 float xPos;
 float yPos;
 boolean isDrawing;
+boolean isSelecting;
 
 // Window variables
-int width 	= 200;
-int height 	= 200;
+int width 	= 1000;
+int height 	= 1000;
 
 void setup() {
 	
@@ -40,12 +41,13 @@ void setup() {
 
 	// Control parameters - draw() will not update unless called from MIDI routine
 	isDrawing = true;
+	isSelecting = false;
 	noLoop();
 	
 	// TODO
 	// Drawing window parameterse
-	size(200, 200);
-
+	size(1000, 1000);
+	ellipseMode(CENTER);
 
 }
 
@@ -54,18 +56,17 @@ void draw() {
 	// TODO
 	// Drawing mode
 	if (isDrawing) {
-		
-		
 
-
-
+		ellipse(xPos, yPos, drawSize, drawSize);
 
 
 	// TO DO
 	// Color selection mode
-	} else {
-		
+	} 
 
+	if (isSelecting) {
+
+		println("selecting");
 
 
 
@@ -86,8 +87,14 @@ void rawMidi(byte[] data) {
 	// Check for mode change message
 	int status = (int)(data[0] & 0xFF);
 	if (status == 0) {
-		if (isDrawing) isDrawing = false;
-		isDrawing = true;	
+		if (isDrawing && !isSelecting) {
+			isDrawing = false;
+			isSelecting = true;
+		} 
+		else {
+			isDrawing = true;
+			isSelecting = false;
+		}	
 	}
 	
 	// Print coordinates for debugging
@@ -101,8 +108,8 @@ void rawMidi(byte[] data) {
 	println(dir + ": " + (posPos - posNeg));
 	
 	// Set coordinates
-	if (status == 154) xPos = (float) (posPos - posNeg) * 1.5;
-	if (status == 155) xPos = (float) (posPos - posNeg) * 1.5;
+	if (status == 154) xPos = (float) (posPos - posNeg) * 5;
+	if (status == 155) yPos = (float) (posPos - posNeg) * 5;
 
 
 	// Set drawing size
