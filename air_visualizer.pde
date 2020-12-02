@@ -6,13 +6,14 @@ MidiBus leapLink;
 // Drawing variables
 float drawSize;
 color drawColor;
+color c;
 float xPos;
 float yPos;
 boolean isDrawing;
 
 // Window variables
-int width;
-int height;
+int width 	= 200;
+int height 	= 200;
 
 void setup() {
 	
@@ -43,7 +44,7 @@ void setup() {
 	
 	// TODO
 	// Drawing window parameterse
-	size(width, height);
+	size(200, 200);
 
 
 }
@@ -110,7 +111,7 @@ void rawMidi(byte[] data) {
 	// TODO
 	// Set color
 	if (!isDrawing) {
-		c = new Color();
+		c = color((int) xPos, (int) yPos, (int) drawSize);
 	}
 
 	// Recall the draw function
