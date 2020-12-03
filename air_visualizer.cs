@@ -64,7 +64,10 @@ public class AirVisualizer {
                     };
 
                     // Send is drawing MIDI change method
-                    if (isDrawing ^ wasDrawing) drawLink.sendCommand(new byte[]{0, 0, 0});
+                    if (isDrawing ^ wasDrawing) {
+                        Console.WriteLine("send");
+                        drawLink.sendCommand(new byte[]{0b10011101, 0, 0});
+                    };
 
                     // Scale heights
                     // Centimeters
@@ -75,19 +78,25 @@ public class AirVisualizer {
                     // Send coordinates over MIDI
                     if (scaleX > 0) drawLink.sendCommand(new byte[]{0b10011010, (byte) scaleX, 0});
                     else            drawLink.sendCommand(new byte[]{0b10011010, 0, (byte) MathF.Abs(scaleX)});
+                    
 
                     if (scaleY > 0) drawLink.sendCommand(new byte[]{0b10011011, (byte) scaleY, 0});
                     else            drawLink.sendCommand(new byte[]{0b10011011, 0, (byte) MathF.Abs(scaleY)});
                     
                     if (scaleZ > 0) drawLink.sendCommand(new byte[]{0b10011100, (byte) scaleZ, 0});
-                    else            drawLink.sendCommand(new byte[]{0b10011100, 0, (byte) MathF.Abs(scaleZ)});                    
+                    else            drawLink.sendCommand(new byte[]{0b10011100, 0, (byte) MathF.Abs(scaleZ)});
+
+                    drawLink.sendCommand(new byte[]{0b10011110, (byte) MathF.Abs(scaleY), (byte) MathF.Abs(scaleX)});
+                    drawLink.sendCommand(new byte[]{0b10001110, (byte) MathF.Abs(scaleY), (byte) MathF.Abs(scaleX)});
+                    
+                                        
 
                     // Exit if not in drawing mode and close to camera
                     if (!isDrawing && scaleX > 75) return;
 
                 }
             
-            System.Threading.Thread.Sleep(1000);
+            System.Threading.Thread.Sleep(50);
             
             }
         }

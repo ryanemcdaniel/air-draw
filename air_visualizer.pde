@@ -9,12 +9,14 @@ color drawColor;
 color c;
 float xPos;
 float yPos;
+float xOffset;
+float yOffset;
 boolean isDrawing;
 boolean isSelecting;
 
 // Window variables
-int width 	= 1000;
-int height 	= 1000;
+int width 	= 700;
+int height 	= 700;
 
 void setup() {
 	
@@ -46,8 +48,10 @@ void setup() {
 	
 	// TODO
 	// Drawing window parameterse
-	size(1000, 1000);
+	size(700, 700);
 	ellipseMode(CENTER);
+
+	xOffset = width  / 2;
 
 }
 
@@ -56,8 +60,8 @@ void draw() {
 	// TODO
 	// Drawing mode
 	if (isDrawing) {
-
-		ellipse(xPos, yPos, drawSize, drawSize);
+		noStroke();
+		ellipse(xPos + xOffset, height - yPos, drawSize, drawSize);
 
 
 	// TO DO
@@ -68,17 +72,12 @@ void draw() {
 
 		println("selecting");
 
+	}
 
-
-
-
-
-
-		// Low threshold to exit application
-		if (yPos > 75) {
-			save("poof.png");
-			exit();
-		}
+	// Threshold to save and exit
+	if (yPos > 500) {
+		save("poof.png");
+		exit();
 	}
 }
 
@@ -86,15 +85,16 @@ void rawMidi(byte[] data) {
 
 	// Check for mode change message
 	int status = (int)(data[0] & 0xFF);
-	if (status == 0) {
-		if (isDrawing && !isSelecting) {
+	
+	
+	if (status == 157) {
+		println("mode switch");
+		
+		if (isDrawing) {
 			isDrawing = false;
-			isSelecting = true;
-		} 
-		else {
-			isDrawing = true;
-			isSelecting = false;
-		}	
+			fill(random(0, 255), random(0, 255), random(0, 255));
+		}else isDrawing = true;
+
 	}
 	
 	// Print coordinates for debugging
@@ -105,24 +105,17 @@ void rawMidi(byte[] data) {
 	
 	int posPos = (int)(data[1] & 0xFF);
 	int posNeg = (int)(data[2] & 0xFF);
-	println(dir + ": " + (posPos - posNeg));
+	// println(dir + ": " + (posPos - posNeg));
 	
 	// Set coordinates
 	if (status == 154) xPos = (float) (posPos - posNeg) * 5;
 	if (status == 155) yPos = (float) (posPos - posNeg) * 5;
 
-
 	// Set drawing size
-	if (isDrawing && status == 156) drawSize = (float) (posPos - posNeg) * 1.5;
-	
-	// TODO
-	// Set color
-	if (!isDrawing) {
-		c = color((int) xPos, (int) yPos, (int) drawSize);
-	}
+	if (isDrawing && status == 156) drawSize = (float) (posNeg) * 3;
 
 	// Recall the draw function
-	redraw();
+	if(isDrawing) redraw();
 }
 
 void delay(int time) {
