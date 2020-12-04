@@ -41,58 +41,48 @@ void setup() {
 	}
 	println("Found C# loopback port!");
 
-	// Control parameters - draw() will not update unless called from MIDI routine
+	// Control parameters
+	// MIDI interrupt handler will call draw function
+	noLoop(); 
 	isDrawing = true;
 	isSelecting = false;
-	noLoop();
 	
-	// TODO
 	// Drawing window parameterse
-	size(700, 700);
+	size(1000, 1000);
 	ellipseMode(CENTER);
-
+	noStroke();
 	xOffset = width  / 2;
 
 }
 
 void draw() {
 
-	// TODO
-	// Drawing mode
 	if (isDrawing) {
-		noStroke();
 		ellipse(xPos + xOffset, height - yPos, drawSize, drawSize);
-
-
-	// TO DO
-	// Color selection mode
-	} 
-
-	if (isSelecting) {
-
-		println("selecting");
-
 	}
 
 	// Threshold to save and exit
-	if (yPos > 500) {
+	if (yPos > 1000) {
 		save("poof.png");
 		exit();
 	}
+
 }
 
 void rawMidi(byte[] data) {
 
-	// Check for mode change message
+	// Check MIDI command byte for
+	// hand tracking status
 	int status = (int)(data[0] & 0xFF);
 	
-	
+	// Switch drawing state if applicable
 	if (status == 157) {
 		println("mode switch");
 		
 		if (isDrawing) {
 			isDrawing = false;
 			fill(random(0, 255), random(0, 255), random(0, 255));
+
 		}else isDrawing = true;
 
 	}
@@ -108,14 +98,19 @@ void rawMidi(byte[] data) {
 	// println(dir + ": " + (posPos - posNeg));
 	
 	// Set coordinates
-	if (status == 154) xPos = (float) (posPos - posNeg) * 5;
-	if (status == 155) yPos = (float) (posPos - posNeg) * 5;
+	if (status == 154) xPos = (float) (posPos - posNeg) * 10;
+	if (status == 155) yPos = (float) (posPos - posNeg) * 10;
 
 	// Set drawing size
-	if (isDrawing && status == 156) drawSize = (float) (posNeg) * 3;
+	if (isDrawing && status == 156) drawSize = (float) (posNeg) * 4;
 
-	// Recall the draw function
+	// Call draw function
 	if(isDrawing) redraw();
+
+	// Inefficiently transform coordinates to color
+	else {
+		fill((int) xPos / 5, (int) yPos / 5, (int) drawSize / 2);
+	}
 }
 
 void delay(int time) {
