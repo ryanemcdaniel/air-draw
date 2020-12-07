@@ -15,8 +15,8 @@ boolean isDrawing;
 boolean isSelecting;
 
 // Window variables
-int width 	= 700;
-int height 	= 700;
+int width 	= 2700;
+int height 	= 1800;
 
 void setup() {
 	
@@ -48,7 +48,7 @@ void setup() {
 	
 	// TODO
 	// Drawing window parameterse
-	size(700, 700);
+	size(3000, 2000);
 	ellipseMode(CENTER);
 
 	xOffset = width  / 2;
@@ -75,7 +75,7 @@ void draw() {
 	}
 
 	// Threshold to save and exit
-	if (yPos > 500) {
+	if (yPos > 1600) {
 		save("poof.png");
 		exit();
 	}
@@ -108,11 +108,11 @@ void rawMidi(byte[] data) {
 	// println(dir + ": " + (posPos - posNeg));
 	
 	// Set coordinates
-	if (status == 154) xPos = (float) (posPos - posNeg) * 5;
-	if (status == 155) yPos = (float) (posPos - posNeg) * 5;
+	if (status == 154) xPos = (float) (posPos - posNeg) * 25;
+	if (status == 155) yPos = (float) (posPos - posNeg) * 18;
 
 	// Set drawing size
-	if (isDrawing && status == 156) drawSize = (float) (posNeg) * 3;
+	if (isDrawing && status == 156) drawSize = (float) (10 + posPos) * 12;
 
 	// Recall the draw function
 	if(isDrawing) redraw();

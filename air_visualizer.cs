@@ -45,6 +45,7 @@ public class AirVisualizer {
                 Hand h = f.Hands[0];
                 if(h.IsRight){
                     
+                    // Set mode flags
                     if(isDrawing) wasDrawing = true;
                     else wasDrawing = false;
                     
@@ -56,11 +57,11 @@ public class AirVisualizer {
                     var distance = MathF.Sqrt(MathF.Pow((indexTip.x - middleTip.x), 2) + MathF.Pow((indexTip.y - middleTip.y), 2) + MathF.Pow((indexTip.z - middleTip.z), 2));
                     if (distance <= 20){
                         isDrawing = false;
-                        Console.WriteLine("ope");    
+                        Console.WriteLine("drawing");    
                     }
                     else {
                         isDrawing = true;
-                        Console.WriteLine("uh");  
+                        Console.WriteLine("not drawing");  
                     };
 
                     // Send is drawing MIDI change method
@@ -78,7 +79,6 @@ public class AirVisualizer {
                     // Send coordinates over MIDI
                     if (scaleX > 0) drawLink.sendCommand(new byte[]{0b10011010, (byte) scaleX, 0});
                     else            drawLink.sendCommand(new byte[]{0b10011010, 0, (byte) MathF.Abs(scaleX)});
-                    
 
                     if (scaleY > 0) drawLink.sendCommand(new byte[]{0b10011011, (byte) scaleY, 0});
                     else            drawLink.sendCommand(new byte[]{0b10011011, 0, (byte) MathF.Abs(scaleY)});
@@ -89,15 +89,10 @@ public class AirVisualizer {
                     drawLink.sendCommand(new byte[]{0b10011110, (byte) MathF.Abs(scaleY), (byte) MathF.Abs(scaleX)});
                     drawLink.sendCommand(new byte[]{0b10001110, (byte) MathF.Abs(scaleY), (byte) MathF.Abs(scaleX)});
                     
-                                        
-
                     // Exit if not in drawing mode and close to camera
                     if (!isDrawing && scaleX > 75) return;
-
                 }
-            
             System.Threading.Thread.Sleep(50);
-            
             }
         }
     }
